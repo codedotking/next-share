@@ -1,17 +1,15 @@
 import Image from "next/image";
 import * as React from "react";
-import { ModeToggle } from "./dark-mode";
-
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn } from "@lib/utils";
+import { Button } from "../ui/button";
+import { auth } from "@auth";
+import { UserNav } from "./user-nav";
 
-export default function Header({ className }: { className?: string }) {
+export default async function Header({ className }: { className?: string }) {
+  const session = await auth();
   return (
-    <header
-      className={cn(
-        "z-10 max-w-5xl w-full flex items-center justify-between font-mono text-sm lg:flex mb-4",
-        className
-      )}>
+    <nav className={cn("flex justify-between items-center w-full mb-16 pt-3", className)}>
       <Link
         className="pointer-events-none flex place-items-center gap-2 backdrop-blur-2xl   lg:pointer-events-auto lg:p-0"
         href="/"
@@ -26,7 +24,19 @@ export default function Header({ className }: { className?: string }) {
         />
         <span className=" text-xl">share</span>
       </Link>
-      <ModeToggle />
-    </header>
+      <div className=" flex gap-2">
+        {session ? (
+          <UserNav
+            image={session.user?.image}
+            name={session.user?.name}
+            email={session.user?.email}
+          />
+        ) : (
+          <Link href={"/login"}>
+            <Button variant={"outline"}>Log in</Button>
+          </Link>
+        )}
+      </div>
+    </nav>
   );
 }
